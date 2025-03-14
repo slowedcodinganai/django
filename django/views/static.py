@@ -42,7 +42,9 @@ def serve(request, path, document_root=None, show_indexes=False):
     ``static/directory_index.html``.
     """
     path = posixpath.normpath(path).lstrip("/")
-    fullpath = Path(safe_join(document_root, path))
+    fullpath = Path(safe_join(document_root, path)).resolve()
+    if not str(fullpath).startswith(str(Path(document_root).resolve())):
+        raise Http404(_("“%(path)s” is not allowed") % {"path": fullpath})
     if fullpath.is_dir():
         if show_indexes:
             return directory_index(path, fullpath)
